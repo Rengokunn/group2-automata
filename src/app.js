@@ -207,6 +207,11 @@ async function loadLabAct(act) {
 // ── Input Fields ──────────────────────────────────
 function renderInputFields(inputs) {
   inputFields.innerHTML = "";
+
+  // Palindrome has 1 input that can be any string — always enabled
+  // Everything else: disable Run until all fields have something typed
+  const needsValidation = inputs.length > 0;
+
   inputs.forEach((inp, i) => {
     const group = document.createElement("div");
     group.className = "input-group";
@@ -216,22 +221,40 @@ function renderInputFields(inputs) {
     label.textContent = inp.label || `Input ${i + 1}`;
 
     const input = document.createElement("input");
-    input.type        = "text";
-    input.id          = `input-${i}`;
-    input.placeholder = inp.placeholder || "";
+    input.type         = "text";
+    input.id           = `input-${i}`;
+    input.placeholder  = inp.placeholder || "";
     input.autocomplete = "off";
-    input.spellcheck  = false;
+    input.spellcheck   = false;
+
+    // #2 — on every keystroke, update Run button disabled state
+    input.addEventListener("input", () => {
+      updateRunBtnState();
+      // clear red outline as soon as user starts typing again
+      input.classList.remove("input-error");
+    });
+
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") runBtn.click(); });
 
     group.appendChild(label);
     group.appendChild(input);
     inputFields.appendChild(group);
   });
+
+  // Set initial state right after rendering
+  updateRunBtnState();
+}
+
+// #2 — disable Run if any input field is empty (and not locked)
+function updateRunBtnState() {
+  if (locked) return;
+  const allFilled = Array.from(inputFields.querySelectorAll("input"))
+    .every(inp => inp.value.trim() !== "");
+  runBtn.disabled = !allFilled;
 }
 
 // ── Run Button ────────────────────────────────────
 runBtn.addEventListener("click", () => {
-  // #3 — if locked out, block
   if (locked) {
     outputBox.textContent = "Maximum attempts reached. Please click \"Clear\" to reset and try again.";
     outputBox.className   = "output-box error";
@@ -244,16 +267,23 @@ runBtn.addEventListener("click", () => {
     return;
   }
 
-  const inputs = Array.from(inputFields.querySelectorAll("input")).map(i => i.value);
+  // #1 — clear any previous red outlines before running
+  inputFields.querySelectorAll("input").forEach(inp => inp.classList.remove("input-error"));
+
+  const inputEls = Array.from(inputFields.querySelectorAll("input"));
+  const inputs   = inputEls.map(i => i.value);
 
   try {
     const result = currentMain(inputs);
     outputBox.textContent = result ?? "(no output)";
     outputBox.className   = "output-box success";
-    resetAttempts(); // successful run resets counter
+    resetAttempts();
   } catch (err) {
     attempts++;
     const remaining = MAX_ATTEMPTS - attempts;
+
+    // #1 — figure out which field(s) caused the error and highlight them in red
+    markErrorInputs(inputEls, err.message);
 
     if (remaining <= 0) {
       locked = true;
@@ -270,16 +300,42 @@ runBtn.addEventListener("click", () => {
   }
 });
 
+// #1 — highlight the input field(s) that caused the error
+function markErrorInputs(inputEls, errorMsg) {
+  if (inputEls.length === 0) return;
+
+  const msg = errorMsg.toLowerCase();
+
+  if (inputEls.length === 1) {
+    // Single input — always highlight it
+    inputEls[0].classList.add("input-error");
+    return;
+  }
+
+  // Two inputs — detect which one the error message refers to
+  const mentionsFirst  = msg.includes("first");
+  const mentionsSecond = msg.includes("second");
+
+  if (mentionsFirst && !mentionsSecond) {
+    inputEls[0].classList.add("input-error");
+  } else if (mentionsSecond && !mentionsFirst) {
+    inputEls[1].classList.add("input-error");
+  } else {
+    // Ambiguous or both — highlight all
+    inputEls.forEach(inp => inp.classList.add("input-error"));
+  }
+}
+
 // ── Clear Button (#4 #13) ─────────────────────────
 clearBtn.addEventListener("click", () => {
-  // Clear all input fields
-  inputFields.querySelectorAll("input").forEach(inp => { inp.value = ""; });
-  // Clear output
+  inputFields.querySelectorAll("input").forEach(inp => {
+    inp.value = "";
+    inp.classList.remove("input-error"); // #1 — clear red outlines
+  });
   outputBox.textContent = "Program output will appear here.";
   outputBox.className   = "output-box";
-  // Reset attempt counter
   resetAttempts();
-  // Focus first input
+  updateRunBtnState(); // #2 — re-evaluate disabled state after clear
   const first = inputFields.querySelector("input");
   if (first) first.focus();
 });
@@ -288,11 +344,11 @@ clearBtn.addEventListener("click", () => {
 function resetAttempts() {
   attempts = 0;
   locked   = false;
-  runBtn.disabled = false;
   if (attemptsDisplay) {
     attemptsDisplay.textContent = "";
     attemptsDisplay.className   = "attempts-display";
   }
+  updateRunBtnState(); // re-evaluate based on current input content
 }
 
 // ── Extract main() ────────────────────────────────

@@ -934,13 +934,11 @@ body {
   .input-group input { font-size: 16px; /* prevent zoom on iOS */ }
 }
 
-/* Very small */
 @media (max-width: 360px) {
   .hero-card h2 { font-size: 16px; }
   .tab-btn { padding: 10px 10px; font-size: 11px; }
 }
 
-/* ── Run Row (Run + Clear side by side) ── */
 .run-row {
   display: flex;
   gap: 10px;
@@ -948,7 +946,6 @@ body {
   flex-wrap: wrap;
 }
 
-/* Clear Button */
 .clear-btn {
   padding: 11px 20px;
   background: transparent;
@@ -972,7 +969,6 @@ body {
 
 .clear-btn:active { transform: translateY(0); }
 
-/* Attempts Display (#3) */
 .attempts-display {
   font-size: 12.5px;
   font-family: var(--font-mono);
@@ -990,9 +986,25 @@ body {
   font-weight: 500;
 }
 
-/* Disable run button when locked */
 .run-btn:disabled {
   opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.input-group input.input-error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.input-group input.input-error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.run-btn:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
   transform: none !important;
   box-shadow: none !important;
