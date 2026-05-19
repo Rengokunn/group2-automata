@@ -4,17 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Group 2 – ACSAD Automata</title>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css" />
     <link rel="stylesheet" href="src/style.css" />
   </head>
   <body>
@@ -28,14 +21,7 @@
               <h1>Automata Lab Acts</h1>
             </div>
           </div>
-          <button
-            id="sidebarRailToggleBtn"
-            class="sidebar-toggle sidebar-toggle-ghost"
-            type="button"
-            aria-controls="sidebar"
-            aria-expanded="true"
-            aria-label="Collapse sidebar"
-          >
+          <button id="sidebarRailToggleBtn" class="sidebar-toggle sidebar-toggle-ghost" type="button" aria-controls="sidebar" aria-expanded="true" aria-label="Collapse sidebar">
             <span class="toggle-arrow" aria-hidden="true"></span>
           </button>
         </div>
@@ -48,9 +34,7 @@
         <section class="main-toolbar" aria-label="Layout controls">
           <div class="toolbar-copy">
             <p class="eyebrow">Automata</p>
-            <p class="toolbar-description">
-              A lab-first workspace for reviewing algorithm source code, screenshots, and executable outputs.
-            </p>
+            <p class="toolbar-description">A lab-first workspace for reviewing algorithm source code, screenshots, and executable outputs.</p>
           </div>
           <button id="mobileSidebarBtn" class="mobile-sidebar-btn" type="button" aria-label="Open navigation">
             <span></span><span></span><span></span>
@@ -63,9 +47,7 @@
             <h2 id="groupName">Loading group...</h2>
             <p id="memberNames" class="members">Please wait while the lab acts are loaded.</p>
           </div>
-          <a id="downloadBtn" class="download-btn" href="#" download aria-disabled="true">
-            Download Group Archive
-          </a>
+          <a id="downloadBtn" class="download-btn" href="#" download aria-disabled="true">Download Group Archive</a>
         </section>
 
         <section class="lab-card" aria-live="polite">
@@ -82,9 +64,7 @@
             <div class="skeleton-code"></div>
           </div>
 
-          <div id="emptyState" class="empty-state" hidden>
-            Select a lab act above to preview its source code and run the algorithm.
-          </div>
+          <div id="emptyState" class="empty-state" hidden>Select a lab act above to preview its source code and run the algorithm.</div>
 
           <article id="labPanel" class="lab-panel" hidden>
             <div class="lab-heading">
@@ -114,7 +94,11 @@
                 <h4 id="tryTitle">Try It</h4>
               </div>
               <div id="inputFields" class="input-fields"></div>
-              <button id="runBtn" class="run-btn" type="button">▶ Run</button>
+              <div class="run-row">
+                <button id="runBtn" class="run-btn" type="button">▶ Run</button>
+                <button id="clearBtn" class="clear-btn" type="button">↺ Clear</button>
+              </div>
+              <p id="attemptsDisplay" class="attempts-display" aria-live="polite"></p>
               <label id="outputLabel" for="outputBox">Output</label>
               <pre id="outputBox" class="output-box" aria-live="polite">Program output will appear here.</pre>
             </section>

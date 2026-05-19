@@ -1,41 +1,42 @@
 // =====================================================
 //  GROUP 2 – ACSAD AUTOMATA  |  src/app.js
-//  Mirrors the structure of the main ACSAD-AUTOMATA
-//  repo so this can be dropped into groups/group2/
 // =====================================================
 
 const GROUP_PATH = "./groups/group2/info.json";
 
 // ── DOM refs ──────────────────────────────────────
-const groupName     = document.getElementById("groupName");
-const memberNames   = document.getElementById("memberNames");
-const downloadBtn   = document.getElementById("downloadBtn");
-const tabRow        = document.getElementById("tabRow");
-const subTabRow     = document.getElementById("subTabRow");
-const skeletonState = document.getElementById("skeletonState");
-const emptyState    = document.getElementById("emptyState");
-const labPanel      = document.getElementById("labPanel");
-const labTitle      = document.getElementById("labTitle");
-const labDescription= document.getElementById("labDescription");
-const screenshotImage = document.getElementById("screenshotImage");
-const previewFallback = document.getElementById("previewFallback");
-const codeBlock     = document.getElementById("codeBlock");
-const sourceFile    = document.getElementById("sourceFile");
-const inputFields   = document.getElementById("inputFields");
-const runBtn        = document.getElementById("runBtn");
-const outputBox     = document.getElementById("outputBox");
-const sidebar       = document.getElementById("sidebar");
-const sidebarToggle = document.getElementById("sidebarRailToggleBtn");
-const sidebarOverlay= document.getElementById("sidebarOverlay");
+const groupName      = document.getElementById("groupName");
+const memberNames    = document.getElementById("memberNames");
+const downloadBtn    = document.getElementById("downloadBtn");
+const tabRow         = document.getElementById("tabRow");
+const subTabRow      = document.getElementById("subTabRow");
+const skeletonState  = document.getElementById("skeletonState");
+const emptyState     = document.getElementById("emptyState");
+const labPanel       = document.getElementById("labPanel");
+const labTitle       = document.getElementById("labTitle");
+const labDescription = document.getElementById("labDescription");
+const screenshotImage= document.getElementById("screenshotImage");
+const previewFallback= document.getElementById("previewFallback");
+const codeBlock      = document.getElementById("codeBlock");
+const sourceFile     = document.getElementById("sourceFile");
+const inputFields    = document.getElementById("inputFields");
+const runBtn         = document.getElementById("runBtn");
+const clearBtn       = document.getElementById("clearBtn");       // #4 #13
+const outputBox      = document.getElementById("outputBox");
+const attemptsDisplay= document.getElementById("attemptsDisplay"); // #3
+const sidebar        = document.getElementById("sidebar");
+const sidebarToggle  = document.getElementById("sidebarRailToggleBtn");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
 const mobileSidebarBtn = document.getElementById("mobileSidebarBtn");
-const groupList     = document.getElementById("groupList");
-const mainContent   = document.querySelector(".main-content");
+const groupList      = document.getElementById("groupList");
+const mainContent    = document.querySelector(".main-content");
 
 // ── State ─────────────────────────────────────────
-let groupData       = null;
-let activeTabIndex  = 0;
-let activeSubIndex  = 0;
-let currentMain     = null; // the loaded main() function
+let groupData    = null;
+let currentMain  = null;
+const MAX_ATTEMPTS = 5; // #3
+let attempts     = 0;
+let locked       = false;
 
 // ── Boot ──────────────────────────────────────────
 (async function init() {
@@ -45,30 +46,22 @@ let currentMain     = null; // the loaded main() function
 
 // ── Sidebar ───────────────────────────────────────
 function setupSidebar() {
-  // Desktop collapse toggle
   sidebarToggle.addEventListener("click", () => {
     const collapsed = sidebar.classList.toggle("collapsed");
     sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
-    if (collapsed) {
-      mainContent.classList.add("sidebar-collapsed");
-    } else {
-      mainContent.classList.remove("sidebar-collapsed");
-    }
+    mainContent.classList.toggle("sidebar-collapsed", collapsed);
   });
 
-  // Mobile open
   mobileSidebarBtn?.addEventListener("click", () => {
     sidebar.classList.add("mobile-open");
     sidebarOverlay.classList.add("mobile-open");
   });
 
-  // Mobile close via overlay
   sidebarOverlay.addEventListener("click", () => {
     sidebar.classList.remove("mobile-open");
     sidebarOverlay.classList.remove("mobile-open");
   });
 
-  // Build sidebar nav — for now just Group 2 (this site IS group 2)
   renderSidebarNav();
 }
 
@@ -77,19 +70,15 @@ function renderSidebarNav() {
   const btn = document.createElement("button");
   btn.className = "group-nav-btn active";
   btn.setAttribute("aria-current", "page");
-  btn.innerHTML = `
-    <span class="group-avatar">G2</span>
-    <span class="group-nav-label">Group 2</span>
-  `;
+  btn.innerHTML = `<span class="group-avatar">G2</span><span class="group-nav-label">Group 2</span>`;
   btn.addEventListener("click", () => {
-    // Close mobile sidebar on selection
     sidebar.classList.remove("mobile-open");
     sidebarOverlay.classList.remove("mobile-open");
   });
   groupList.appendChild(btn);
 }
 
-// ── Load Group Data ───────────────────────────────
+// ── Load Group ────────────────────────────────────
 async function loadGroup() {
   showSkeleton();
   try {
@@ -108,12 +97,9 @@ async function loadGroup() {
 // ── Hero ──────────────────────────────────────────
 function renderHero() {
   groupName.textContent = groupData.group || "Group 2";
-
-  if (Array.isArray(groupData.members) && groupData.members.length > 0) {
-    memberNames.textContent = groupData.members.join("  ·  ");
-  } else {
-    memberNames.textContent = "Members not listed.";
-  }
+  memberNames.textContent = Array.isArray(groupData.members) && groupData.members.length > 0
+    ? groupData.members.join("  ·  ")
+    : "Members not listed.";
 
   if (groupData.download) {
     downloadBtn.href = `./groups/group2/${groupData.download}`;
@@ -136,10 +122,6 @@ function renderTabs() {
 }
 
 function selectTab(index) {
-  activeTabIndex = index;
-  activeSubIndex = 0;
-
-  // Update tab button states
   tabRow.querySelectorAll(".tab-btn").forEach((btn, i) => {
     btn.classList.toggle("active", i === index);
     btn.setAttribute("aria-selected", String(i === index));
@@ -147,7 +129,6 @@ function selectTab(index) {
 
   const act = groupData.labacts[index];
 
-  // Handle "Recursion" tab with subtabs
   if (act.subtabs && act.subtabs.length > 0) {
     renderSubTabs(act.subtabs);
     subTabRow.hidden = false;
@@ -173,7 +154,6 @@ function renderSubTabs(subtabs) {
 }
 
 function selectSubTab(subtabs, index) {
-  activeSubIndex = index;
   subTabRow.querySelectorAll(".sub-tab-btn").forEach((btn, i) => {
     btn.classList.toggle("active", i === index);
     btn.setAttribute("aria-selected", String(i === index));
@@ -181,32 +161,27 @@ function selectSubTab(subtabs, index) {
   loadLabAct(subtabs[index]);
 }
 
-// ── Load a Lab Act ────────────────────────────────
+// ── Load Lab Act ──────────────────────────────────
 async function loadLabAct(act) {
   showSkeleton();
   currentMain = null;
-  outputBox.textContent = "Program output will appear here.";
-  outputBox.className = "output-box";
+  resetAttempts(); // #3 — reset counter on new lab act
 
   try {
-    // Load source code
     const codeRes = await fetch(`./groups/group2/${act.file}`);
     if (!codeRes.ok) throw new Error(`Source file not found: ${act.file}`);
     const codeText = await codeRes.text();
 
-    // Extract and load main() function safely
     currentMain = extractMain(codeText);
 
-    // Render panel
     labTitle.textContent       = act.name;
     labDescription.textContent = act.description || "";
     sourceFile.textContent     = act.file;
     codeBlock.textContent      = codeText;
     codeBlock.className        = act.file.endsWith(".java") ? "language-java" : "language-javascript";
 
-    // Screenshot
     if (act.screenshot) {
-      screenshotImage.src = `./groups/group2/${act.screenshot}`;
+      screenshotImage.src    = `./groups/group2/${act.screenshot}`;
       screenshotImage.hidden = false;
       previewFallback.hidden = true;
       screenshotImage.onerror = () => {
@@ -218,12 +193,8 @@ async function loadLabAct(act) {
       previewFallback.hidden = false;
     }
 
-    // Input fields
     renderInputFields(act.inputs || []);
-
-    // Highlight
     hljs.highlightElement(codeBlock);
-
     hideSkeleton();
     showPanel();
 
@@ -245,16 +216,12 @@ function renderInputFields(inputs) {
     label.textContent = inp.label || `Input ${i + 1}`;
 
     const input = document.createElement("input");
-    input.type = "text";
-    input.id = `input-${i}`;
+    input.type        = "text";
+    input.id          = `input-${i}`;
     input.placeholder = inp.placeholder || "";
     input.autocomplete = "off";
-    input.spellcheck = false;
-
-    // Run on Enter key
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") runBtn.click();
-    });
+    input.spellcheck  = false;
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") runBtn.click(); });
 
     group.appendChild(label);
     group.appendChild(input);
@@ -264,9 +231,16 @@ function renderInputFields(inputs) {
 
 // ── Run Button ────────────────────────────────────
 runBtn.addEventListener("click", () => {
+  // #3 — if locked out, block
+  if (locked) {
+    outputBox.textContent = "Maximum attempts reached. Please click \"Clear\" to reset and try again.";
+    outputBox.className   = "output-box error";
+    return;
+  }
+
   if (!currentMain) {
     outputBox.textContent = "Error: No algorithm loaded.";
-    outputBox.className = "output-box error";
+    outputBox.className   = "output-box error";
     return;
   }
 
@@ -275,22 +249,58 @@ runBtn.addEventListener("click", () => {
   try {
     const result = currentMain(inputs);
     outputBox.textContent = result ?? "(no output)";
-    outputBox.className = "output-box success";
+    outputBox.className   = "output-box success";
+    resetAttempts(); // successful run resets counter
   } catch (err) {
+    attempts++;
+    const remaining = MAX_ATTEMPTS - attempts;
+
+    if (remaining <= 0) {
+      locked = true;
+      attemptsDisplay.textContent = "Maximum attempts (5/5) reached. Click \"Clear\" to reset.";
+      attemptsDisplay.className   = "attempts-display locked";
+      runBtn.disabled             = true;
+    } else {
+      attemptsDisplay.textContent = `Invalid input. Attempts: ${attempts}/${MAX_ATTEMPTS} — ${remaining} remaining.`;
+      attemptsDisplay.className   = "attempts-display warning";
+    }
+
     outputBox.textContent = `Error: ${err.message}`;
-    outputBox.className = "output-box error";
+    outputBox.className   = "output-box error";
   }
 });
 
-// ── Extract main() from JS source ─────────────────
+// ── Clear Button (#4 #13) ─────────────────────────
+clearBtn.addEventListener("click", () => {
+  // Clear all input fields
+  inputFields.querySelectorAll("input").forEach(inp => { inp.value = ""; });
+  // Clear output
+  outputBox.textContent = "Program output will appear here.";
+  outputBox.className   = "output-box";
+  // Reset attempt counter
+  resetAttempts();
+  // Focus first input
+  const first = inputFields.querySelector("input");
+  if (first) first.focus();
+});
+
+// ── Attempt Counter ───────────────────────────────
+function resetAttempts() {
+  attempts = 0;
+  locked   = false;
+  runBtn.disabled = false;
+  if (attemptsDisplay) {
+    attemptsDisplay.textContent = "";
+    attemptsDisplay.className   = "attempts-display";
+  }
+}
+
+// ── Extract main() ────────────────────────────────
 function extractMain(source) {
-  // Safely evaluate the JS file and return its main function
-  // We use Function constructor to sandbox it (no window access)
   try {
     const wrapped = `${source}\nreturn main;`;
     // eslint-disable-next-line no-new-func
-    const factory = new Function(wrapped);
-    const fn = factory();
+    const fn = new Function(wrapped)();
     if (typeof fn !== "function") throw new Error("main() not found in source.");
     return fn;
   } catch (err) {
@@ -315,7 +325,7 @@ function showPanel() {
 }
 
 function showEmpty(msg) {
-  emptyState.hidden = false;
+  emptyState.hidden     = false;
   emptyState.textContent = msg || "Select a lab act to get started.";
-  labPanel.hidden = true;
+  labPanel.hidden       = true;
 }

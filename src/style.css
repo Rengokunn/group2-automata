@@ -939,3 +939,61 @@ body {
   .hero-card h2 { font-size: 16px; }
   .tab-btn { padding: 10px 10px; font-size: 11px; }
 }
+
+/* ── Run Row (Run + Clear side by side) ── */
+.run-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Clear Button */
+.clear-btn {
+  padding: 11px 20px;
+  background: transparent;
+  border: 1.5px solid var(--haze-border-2);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: background var(--transition), border-color var(--transition), color var(--transition), transform var(--transition);
+}
+
+.clear-btn:hover {
+  background: var(--haze-surface);
+  border-color: var(--lavender-300);
+  color: var(--lavender-600);
+  transform: translateY(-1px);
+}
+
+.clear-btn:active { transform: translateY(0); }
+
+/* Attempts Display (#3) */
+.attempts-display {
+  font-size: 12.5px;
+  font-family: var(--font-mono);
+  min-height: 18px;
+  color: transparent;
+  transition: color var(--transition);
+}
+
+.attempts-display.warning {
+  color: #b45309;
+}
+
+.attempts-display.locked {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+/* Disable run button when locked */
+.run-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
