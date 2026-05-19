@@ -21,28 +21,71 @@ const codeBlock      = document.getElementById("codeBlock");
 const sourceFile     = document.getElementById("sourceFile");
 const inputFields    = document.getElementById("inputFields");
 const runBtn         = document.getElementById("runBtn");
-const clearBtn       = document.getElementById("clearBtn");       // #4 #13
+const clearBtn       = document.getElementById("clearBtn");
 const outputBox      = document.getElementById("outputBox");
-const attemptsDisplay= document.getElementById("attemptsDisplay"); // #3
+const attemptsDisplay= document.getElementById("attemptsDisplay");
 const sidebar        = document.getElementById("sidebar");
 const sidebarToggle  = document.getElementById("sidebarRailToggleBtn");
 const sidebarOverlay = document.getElementById("sidebarOverlay");
 const mobileSidebarBtn = document.getElementById("mobileSidebarBtn");
 const groupList      = document.getElementById("groupList");
 const mainContent    = document.querySelector(".main-content");
+const scrollTopBtn   = document.getElementById("scrollTopBtn");
+const themeToggleBtn = document.getElementById("themeToggleBtn");
 
 // ── State ─────────────────────────────────────────
 let groupData    = null;
 let currentMain  = null;
-const MAX_ATTEMPTS = 5; // #3
+const MAX_ATTEMPTS = 5;
 let attempts     = 0;
 let locked       = false;
 
 // ── Boot ──────────────────────────────────────────
 (async function init() {
   setupSidebar();
+  setupScrollTop();
+  setupTheme();
   await loadGroup();
 })();
+
+// ── Theme (Light / Dark) ──────────────────────────
+function setupTheme() {
+  const saved = localStorage.getItem("theme") || "dark";
+  applyTheme(saved);
+
+  themeToggleBtn?.addEventListener("click", () => {
+    const next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+    applyTheme(next);
+    localStorage.setItem("theme", next);
+  });
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  if (themeToggleBtn) {
+    themeToggleBtn.setAttribute("aria-label", theme === "light" ? "Switch to dark mode" : "Switch to light mode");
+    themeToggleBtn.innerHTML = theme === "light"
+      ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`
+      : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+  }
+}
+
+// ── Scroll-to-top ──────────────────────────────────
+function setupScrollTop() {
+  if (!scrollTopBtn) return;
+
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 300) {
+      scrollTopBtn.classList.add("visible");
+    } else {
+      scrollTopBtn.classList.remove("visible");
+    }
+  }, { passive: true });
+
+  scrollTopBtn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
 
 // ── Sidebar ───────────────────────────────────────
 function setupSidebar() {
@@ -116,7 +159,13 @@ function renderTabs() {
     btn.setAttribute("role", "tab");
     btn.setAttribute("aria-selected", "false");
     btn.textContent = act.name;
-    btn.addEventListener("click", () => selectTab(i));
+    btn.addEventListener("click", () => {
+      selectTab(i);
+      // Scroll to top of main content when switching tabs on mobile
+      if (window.innerWidth <= 640) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    });
     tabRow.appendChild(btn);
   });
 }
@@ -165,7 +214,7 @@ function selectSubTab(subtabs, index) {
 async function loadLabAct(act) {
   showSkeleton();
   currentMain = null;
-  resetAttempts(); // #3 — reset counter on new lab act
+  resetAttempts();
 
   try {
     const codeRes = await fetch(`./groups/group2/${act.file}`);
@@ -208,10 +257,6 @@ async function loadLabAct(act) {
 function renderInputFields(inputs) {
   inputFields.innerHTML = "";
 
-  // Palindrome has 1 input that can be any string — always enabled
-  // Everything else: disable Run until all fields have something typed
-  const needsValidation = inputs.length > 0;
-
   inputs.forEach((inp, i) => {
     const group = document.createElement("div");
     group.className = "input-group";
@@ -227,10 +272,9 @@ function renderInputFields(inputs) {
     input.autocomplete = "off";
     input.spellcheck   = false;
 
-    // #2 — on every keystroke, update Run button disabled state
     input.addEventListener("input", () => {
       updateRunBtnState();
-      // clear red outline as soon as user starts typing again
+      // Only clear error outline for THIS field when user types in it
       input.classList.remove("input-error");
     });
 
@@ -241,11 +285,10 @@ function renderInputFields(inputs) {
     inputFields.appendChild(group);
   });
 
-  // Set initial state right after rendering
   updateRunBtnState();
 }
 
-// #2 — disable Run if any input field is empty (and not locked)
+// disable Run if any input field is empty (and not locked)
 function updateRunBtnState() {
   if (locked) return;
   const allFilled = Array.from(inputFields.querySelectorAll("input"))
@@ -267,7 +310,7 @@ runBtn.addEventListener("click", () => {
     return;
   }
 
-  // #1 — clear any previous red outlines before running
+  // Clear any previous red outlines before running
   inputFields.querySelectorAll("input").forEach(inp => inp.classList.remove("input-error"));
 
   const inputEls = Array.from(inputFields.querySelectorAll("input"));
@@ -282,7 +325,9 @@ runBtn.addEventListener("click", () => {
     attempts++;
     const remaining = MAX_ATTEMPTS - attempts;
 
-    // #1 — figure out which field(s) caused the error and highlight them in red
+    // FIX: Mark ALL inputs red on error so user knows to check everything.
+    // The algorithms validate sequentially and throw on first bad input,
+    // so we can't know all failing fields — marking all is the safest signal.
     markErrorInputs(inputEls, err.message);
 
     if (remaining <= 0) {
@@ -300,42 +345,52 @@ runBtn.addEventListener("click", () => {
   }
 });
 
-// #1 — highlight the input field(s) that caused the error
+// Highlight input field(s) that likely caused the error.
+// Strategy: parse the error message for field references, then mark all
+// inputs that haven't been explicitly cleared as correct yet.
 function markErrorInputs(inputEls, errorMsg) {
   if (inputEls.length === 0) return;
 
   const msg = errorMsg.toLowerCase();
 
   if (inputEls.length === 1) {
-    // Single input — always highlight it
     inputEls[0].classList.add("input-error");
     return;
   }
 
-  // Two inputs — detect which one the error message refers to
+  // Try to detect which specific field the error mentions
   const mentionsFirst  = msg.includes("first");
   const mentionsSecond = msg.includes("second");
 
   if (mentionsFirst && !mentionsSecond) {
+    // Only first is definitively wrong — mark it; leave second unmarked
+    // but also mark second if it's also empty/suspicious
     inputEls[0].classList.add("input-error");
+    // If second is also empty, mark it too
+    if (inputEls[1] && inputEls[1].value.trim() === "") {
+      inputEls[1].classList.add("input-error");
+    }
   } else if (mentionsSecond && !mentionsFirst) {
     inputEls[1].classList.add("input-error");
+    if (inputEls[0] && inputEls[0].value.trim() === "") {
+      inputEls[0].classList.add("input-error");
+    }
   } else {
-    // Ambiguous or both — highlight all
+    // Ambiguous or mentions both — highlight all inputs
     inputEls.forEach(inp => inp.classList.add("input-error"));
   }
 }
 
-// ── Clear Button (#4 #13) ─────────────────────────
+// ── Clear Button ──────────────────────────────────
 clearBtn.addEventListener("click", () => {
   inputFields.querySelectorAll("input").forEach(inp => {
     inp.value = "";
-    inp.classList.remove("input-error"); // #1 — clear red outlines
+    inp.classList.remove("input-error");
   });
   outputBox.textContent = "Program output will appear here.";
   outputBox.className   = "output-box";
   resetAttempts();
-  updateRunBtnState(); // #2 — re-evaluate disabled state after clear
+  updateRunBtnState();
   const first = inputFields.querySelector("input");
   if (first) first.focus();
 });
@@ -348,7 +403,7 @@ function resetAttempts() {
     attemptsDisplay.textContent = "";
     attemptsDisplay.className   = "attempts-display";
   }
-  updateRunBtnState(); // re-evaluate based on current input content
+  updateRunBtnState();
 }
 
 // ── Extract main() ────────────────────────────────
