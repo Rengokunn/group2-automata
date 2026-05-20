@@ -216,6 +216,9 @@ async function loadLabAct(act) {
   currentMain = null;
   resetAttempts();
 
+  outputBox.textContent = "Program output will appear here.";
+  outputBox.className   = "output-box";
+
   try {
     const codeRes = await fetch(`./groups/group2/${act.file}`);
     if (!codeRes.ok) throw new Error(`Source file not found: ${act.file}`);
