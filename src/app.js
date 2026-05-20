@@ -34,11 +34,12 @@ const scrollTopBtn   = document.getElementById("scrollTopBtn");
 const themeToggleBtn = document.getElementById("themeToggleBtn");
 
 // ── State ─────────────────────────────────────────
-let groupData    = null;
-let currentMain  = null;
-const MAX_ATTEMPTS = 5;
-let attempts     = 0;
-let locked       = false;
+let groupData       = null;
+let currentMain     = null;
+let currentValidate = null;
+const MAX_ATTEMPTS  = 5;
+let attempts        = 0;
+let locked          = false;
 
 // ── Boot ──────────────────────────────────────────
 (async function init() {
@@ -161,7 +162,6 @@ function renderTabs() {
     btn.textContent = act.name;
     btn.addEventListener("click", () => {
       selectTab(i);
-      // Scroll to top of main content when switching tabs on mobile
       if (window.innerWidth <= 640) {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
@@ -213,7 +213,8 @@ function selectSubTab(subtabs, index) {
 // ── Load Lab Act ──────────────────────────────────
 async function loadLabAct(act) {
   showSkeleton();
-  currentMain = null;
+  currentMain     = null;
+  currentValidate = null;
   resetAttempts();
 
   outputBox.textContent = "Program output will appear here.";
@@ -224,7 +225,8 @@ async function loadLabAct(act) {
     if (!codeRes.ok) throw new Error(`Source file not found: ${act.file}`);
     const codeText = await codeRes.text();
 
-    currentMain = extractMain(codeText);
+    currentMain     = extractMain(codeText);
+    currentValidate = extractValidate(codeText);
 
     labTitle.textContent       = act.name;
     labDescription.textContent = act.description || "";
@@ -277,7 +279,6 @@ function renderInputFields(inputs) {
 
     input.addEventListener("input", () => {
       updateRunBtnState();
-      // Only clear error outline for THIS field when user types in it
       input.classList.remove("input-error");
     });
 
@@ -313,12 +314,45 @@ runBtn.addEventListener("click", () => {
     return;
   }
 
-  // Clear any previous red outlines before running
-  inputFields.querySelectorAll("input").forEach(inp => inp.classList.remove("input-error"));
-
   const inputEls = Array.from(inputFields.querySelectorAll("input"));
   const inputs   = inputEls.map(i => i.value);
 
+  // Clear previous error outlines
+  inputEls.forEach(inp => inp.classList.remove("input-error"));
+
+  // ── Per-field validation ──
+  if (currentValidate) {
+    const fieldErrors = currentValidate(inputs);
+    const hasErrors   = fieldErrors.some(e => e !== null);
+
+    if (hasErrors) {
+      attempts++;
+      const remaining = MAX_ATTEMPTS - attempts;
+
+      // Mark only the fields that actually failed
+      fieldErrors.forEach((err, i) => {
+        if (err !== null && inputEls[i]) inputEls[i].classList.add("input-error");
+      });
+
+      // Show the first error message in the output box
+      const firstError = fieldErrors.find(e => e !== null);
+      outputBox.textContent = `Error: ${firstError}`;
+      outputBox.className   = "output-box error";
+
+      if (remaining <= 0) {
+        locked = true;
+        attemptsDisplay.textContent = "Maximum attempts (5/5) reached. Click \"Clear\" to reset.";
+        attemptsDisplay.className   = "attempts-display locked";
+        runBtn.disabled             = true;
+      } else {
+        attemptsDisplay.textContent = `Invalid input. Attempts: ${attempts}/${MAX_ATTEMPTS} — ${remaining} remaining.`;
+        attemptsDisplay.className   = "attempts-display warning";
+      }
+      return;
+    }
+  }
+
+  // ── Run main() ──
   try {
     const result = currentMain(inputs);
     outputBox.textContent = result ?? "(no output)";
@@ -328,10 +362,11 @@ runBtn.addEventListener("click", () => {
     attempts++;
     const remaining = MAX_ATTEMPTS - attempts;
 
-    // FIX: Mark ALL inputs red on error so user knows to check everything.
-    // The algorithms validate sequentially and throw on first bad input,
-    // so we can't know all failing fields — marking all is the safest signal.
-    markErrorInputs(inputEls, err.message);
+    // validate() should have caught field errors above; if main() still throws,
+    // it's an unexpected runtime error — mark all fields as a fallback.
+    inputEls.forEach(inp => inp.classList.add("input-error"));
+    outputBox.textContent = `Error: ${err.message}`;
+    outputBox.className   = "output-box error";
 
     if (remaining <= 0) {
       locked = true;
@@ -342,47 +377,8 @@ runBtn.addEventListener("click", () => {
       attemptsDisplay.textContent = `Invalid input. Attempts: ${attempts}/${MAX_ATTEMPTS} — ${remaining} remaining.`;
       attemptsDisplay.className   = "attempts-display warning";
     }
-
-    outputBox.textContent = `Error: ${err.message}`;
-    outputBox.className   = "output-box error";
   }
 });
-
-// Highlight input field(s) that likely caused the error.
-// Strategy: parse the error message for field references, then mark all
-// inputs that haven't been explicitly cleared as correct yet.
-function markErrorInputs(inputEls, errorMsg) {
-  if (inputEls.length === 0) return;
-
-  const msg = errorMsg.toLowerCase();
-
-  if (inputEls.length === 1) {
-    inputEls[0].classList.add("input-error");
-    return;
-  }
-
-  // Try to detect which specific field the error mentions
-  const mentionsFirst  = msg.includes("first");
-  const mentionsSecond = msg.includes("second");
-
-  if (mentionsFirst && !mentionsSecond) {
-    // Only first is definitively wrong — mark it; leave second unmarked
-    // but also mark second if it's also empty/suspicious
-    inputEls[0].classList.add("input-error");
-    // If second is also empty, mark it too
-    if (inputEls[1] && inputEls[1].value.trim() === "") {
-      inputEls[1].classList.add("input-error");
-    }
-  } else if (mentionsSecond && !mentionsFirst) {
-    inputEls[1].classList.add("input-error");
-    if (inputEls[0] && inputEls[0].value.trim() === "") {
-      inputEls[0].classList.add("input-error");
-    }
-  } else {
-    // Ambiguous or mentions both — highlight all inputs
-    inputEls.forEach(inp => inp.classList.add("input-error"));
-  }
-}
 
 // ── Clear Button ──────────────────────────────────
 clearBtn.addEventListener("click", () => {
@@ -422,6 +418,17 @@ function extractMain(source) {
   }
 }
 
+// ── Extract validate() ────────────────────────────
+function extractValidate(source) {
+  try {
+    const wrapped = `${source}\nreturn typeof validate === "function" ? validate : null;`;
+    // eslint-disable-next-line no-new-func
+    return new Function(wrapped)();
+  } catch {
+    return null;
+  }
+}
+
 // ── UI State Helpers ──────────────────────────────
 function showSkeleton() {
   skeletonState.style.display = "flex";
@@ -439,7 +446,7 @@ function showPanel() {
 }
 
 function showEmpty(msg) {
-  emptyState.hidden     = false;
+  emptyState.hidden      = false;
   emptyState.textContent = msg || "Select a lab act to get started.";
-  labPanel.hidden       = true;
+  labPanel.hidden        = true;
 }
