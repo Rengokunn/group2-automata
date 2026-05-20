@@ -24,7 +24,7 @@
       "file": "EuclideanAlgorithm.js",
       "screenshot": "screenshots/EuclideanAlgorithm.png",
       "description": "Finds the Greatest Common Divisor (GCD) and Least Common Multiple (LCM) of two positive integers using the Euclidean algorithm.",
-      "discussion": "The Euclidean Algorithm is one of the oldest known algorithms, described by Euclid around 300 BCE. It computes the Greatest Common Divisor (GCD) of two integers by repeatedly replacing the larger number with the remainder of dividing the larger by the smaller, until the remainder is zero. The last non-zero remainder is the GCD. The LCM is then derived using the identity: LCM(a, b) = |a · b| / GCD(a, b).",
+      "discussion": "The Euclidean Algorithm is one of the oldest known algorithms, described by Euclid around 300 BCE. It computes the Greatest Common Divisor (GCD) of two non-negative integers (with at least one non-zero) by repeatedly replacing the pair (a, b) with (b, r) where r = a mod b, until r = 0. The last non-zero remainder is the GCD. The LCM is then derived using the identity: LCM(a, b) = |a · b| / GCD(a, b).",
       "inputs": [
         { "label": "First Integer", "placeholder": "positive integer, e.g. 48" },
         { "label": "Second Integer", "placeholder": "positive integer, e.g. 18" }
