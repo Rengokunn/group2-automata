@@ -17,7 +17,7 @@ function main(inputs) {
     "This program will find all the terms of the Collatz sequence.",
     "",
     `Initial value: ${n.toLocaleString("en-US")}`,
-    `The Collatz sequence: ${sequence.join(", ")}`,
+    `The Collatz sequence: ${sequence.map(n => n.toLocaleString("en-US")).join(", ")}`,
     "",
     `Total terms: ${sequence.length.toLocaleString("en-US")}`,
   ].join("\n");

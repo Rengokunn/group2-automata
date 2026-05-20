@@ -17,7 +17,7 @@ function main(inputs) {
     "",
     `Input the number of terms: ${n}`,
     "",
-    `The Fibonacci numbers are: ${terms.join(", ")}`,
+    `The Fibonacci numbers are: ${terms.map(n => n.toLocaleString("en-US")).join(", ")}`,
   ].join("\n");
 }
 

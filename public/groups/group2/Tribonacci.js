@@ -18,7 +18,7 @@ function main(inputs) {
     "",
     `Input the number of terms: ${n}`,
     "",
-    `The Tribonacci numbers are: ${terms.join(", ")}`,
+    `The Tribonacci numbers are: ${terms.map(n => n.toLocaleString("en-US")).join(", ")}`,
   ].join("\n");
 }
 
