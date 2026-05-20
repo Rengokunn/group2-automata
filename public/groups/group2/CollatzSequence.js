@@ -1,11 +1,6 @@
 function main(inputs) {
   const raw = String(inputs[0] ?? "").trim();
-
   const n = parseStrictInt(raw, "Initial value", "7");
-
-  if (n <= 0) throw new Error(`Initial value must be a positive integer greater than 0. You entered: ${raw}`);
-  if (n > 1_000_000) throw new Error(`Initial value is too large. Maximum allowed value is 1,000,000.`);
-  if (n % 2 === 0) throw new Error(`Initial value must be a positive ODD integer (e.g. 1, 3, 5, 7...). You entered an even number: ${n}.`);
 
   const sequence = [n];
   let current = n;

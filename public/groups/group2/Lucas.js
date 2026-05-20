@@ -2,10 +2,6 @@ function main(inputs) {
   const raw = String(inputs[0] ?? "").trim();
   const n = parseStrictInt(raw, "Number of terms", "6");
 
-  if (n < 0) throw new Error(`Number of terms cannot be negative. Please enter a positive integer greater than 2.`);
-  if (n <= 2) throw new Error(`Number of terms must be greater than 2. You entered: ${n}. Please enter 3 or more.`);
-  if (n > 78) throw new Error(`Number of terms is too large. Maximum allowed is 78 (beyond this, results become inaccurate due to JavaScript integer limits).`);
-
   const memo = {};
   function lucas(k) {
     if (k === 0) return 2;

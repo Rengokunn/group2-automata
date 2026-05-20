@@ -1,19 +1,5 @@
 function main(inputs) {
   const raw = String(inputs[0] ?? "");
-
-  if (raw.trim() === "") throw new Error("Please enter a string before running.");
-
-  for (let i = 0; i < raw.length; i++) {
-    const code = raw.charCodeAt(i);
-    if (code > 126 || code < 32) {
-      throw new Error(
-        `Invalid character "${raw[i]}" found at position ${i + 1}. ` +
-        `Only standard ASCII characters are allowed (A–Z, a–z, 0–9, spaces, basic punctuation). ` +
-        `Accented characters like é, ñ, ü are not supported.`
-      );
-    }
-  }
-
   const original = raw;
   const length = original.length;
 
@@ -27,10 +13,6 @@ function main(inputs) {
   for (let i = 0; i < lower.length; i++) {
     const code = lower.charCodeAt(i);
     if ((code >= 97 && code <= 122) || (code >= 48 && code <= 57)) cleaned += lower[i];
-  }
-
-  if (cleaned.length === 0) {
-    throw new Error("The string contains no letters or digits. Please enter a string with at least one alphanumeric character.");
   }
 
   let isPalindrome = true;

@@ -5,13 +5,6 @@ function main(inputs) {
   const a = parseStrictInt(rawA, "First integer", "48");
   const b = parseStrictInt(rawB, "Second integer", "18");
 
-  if (a <= 0) throw new Error(`First integer must be greater than 0. You entered: ${rawA}`);
-  if (b <= 0) throw new Error(`Second integer must be greater than 0. You entered: ${rawB}`);
-
-  const LIMIT = 1_000_000;
-  if (a > LIMIT) throw new Error(`First integer is too large. Maximum allowed value is 1,000,000.`);
-  if (b > LIMIT) throw new Error(`Second integer is too large. Maximum allowed value is 1,000,000.`);
-
   const fmt = (x) => x.toLocaleString("en-US");
   const m = Math.max(a, b);
   const n = Math.min(a, b);

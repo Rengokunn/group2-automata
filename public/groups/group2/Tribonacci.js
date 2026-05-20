@@ -2,10 +2,6 @@ function main(inputs) {
   const raw = String(inputs[0] ?? "").trim();
   const n = parseStrictInt(raw, "Number of terms", "10");
 
-  if (n < 0) throw new Error(`Number of terms cannot be negative. Please enter a positive integer greater than 3.`);
-  if (n <= 3) throw new Error(`Number of terms must be greater than 3. You entered: ${n}. Please enter 4 or more.`);
-  if (n > 56) throw new Error(`Number of terms is too large. Maximum allowed is 56 (beyond this, results become inaccurate due to JavaScript integer limits).`);
-
   const memo = {};
   function trib(k) {
     if (k === 0) return 0;
