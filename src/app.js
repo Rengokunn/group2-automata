@@ -247,6 +247,18 @@ async function loadLabAct(act) {
       previewFallback.hidden = false;
     }
 
+    // ── Intro Image ──
+    const introImg = document.getElementById("introImage");
+    if (introImg) {
+      if (act.introImage) {
+        introImg.src    = `./groups/group2/${act.introImage}`;
+        introImg.hidden = false;
+        introImg.onerror = () => { introImg.hidden = true; };
+      } else {
+        introImg.hidden = true;
+      }
+    }
+
     renderInputFields(act.inputs || []);
     hljs.highlightElement(codeBlock);
     hideSkeleton();
