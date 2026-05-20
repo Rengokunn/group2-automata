@@ -1678,7 +1678,7 @@ img[hidden] {
 .intro-image:hover {
   border-color: var(--haze-border-2);
   box-shadow: 0 0 30px rgba(139, 92, 246, 0.08);
-  transform: scale(1.02);
+  transform: none;
 }
 
 [data-theme="light"] .intro-image {
