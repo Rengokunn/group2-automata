@@ -41,3 +41,15 @@ function parseStrictInt(raw, label, example) {
   if (!Number.isFinite(n)) throw new Error(`${label}: The number is too large to process.`);
   return n;
 }
+
+function validate(inputs) {
+  const errors = [null];
+  const raw = String(inputs[0] ?? "").trim();
+  try {
+    const n = parseStrictInt(raw, "Initial value", "7");
+    if (n <= 0) errors[0] = `Must be a positive integer greater than 0.`;
+    else if (n > 1_000_000) errors[0] = `Maximum allowed value is 1,000,000.`;
+    else if (n % 2 === 0) errors[0] = `Must be a positive ODD integer (e.g. 1, 3, 5...).`;
+  } catch (e) { errors[0] = e.message; }
+  return errors;
+}

@@ -39,3 +39,15 @@ function parseStrictInt(raw, label, example) {
   if (!Number.isFinite(n)) throw new Error(`${label}: The number is too large to process.`);
   return n;
 }
+
+function validate(inputs) {
+  const errors = [null];
+  const raw = String(inputs[0] ?? "").trim();
+  try {
+    const n = parseStrictInt(raw, "Number of terms", "10");
+    if (n < 0) errors[0] = `Cannot be negative.`;
+    else if (n <= 3) errors[0] = `Must be greater than 3. Enter 4 or more.`;
+    else if (n > 56) errors[0] = `Maximum allowed is 56.`;
+  } catch (e) { errors[0] = e.message; }
+  return errors;
+}

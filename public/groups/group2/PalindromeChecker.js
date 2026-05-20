@@ -49,3 +49,22 @@ function main(inputs) {
     isPalindrome ? "The string is a PALINDROME :D" : "The string is NOT a PALINDROME >:(",
   ].join("\n");
 }
+
+function validate(inputs) {
+  const errors = [null];
+  const raw = String(inputs[0] ?? "");
+  if (raw.trim() === "") {
+    errors[0] = `Please enter a string before running.`;
+    return errors;
+  }
+  for (let i = 0; i < raw.length; i++) {
+    const code = raw.charCodeAt(i);
+    if (code > 126 || code < 32) {
+      errors[0] = `Invalid character "${raw[i]}" at position ${i + 1}. Only standard ASCII allowed.`;
+      return errors;
+    }
+  }
+  const cleaned = raw.toLowerCase().split("").filter(c => /[a-z0-9]/.test(c)).join("");
+  if (cleaned.length === 0) errors[0] = `No letters or digits found. Enter at least one alphanumeric character.`;
+  return errors;
+}
