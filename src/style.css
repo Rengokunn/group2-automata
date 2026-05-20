@@ -211,8 +211,8 @@ body::before {
   letter-spacing: 1.8px;
   text-transform: uppercase;
   /* Gold eyebrow */
-  color: var(--amber-300);
-  opacity: 0.75;
+  color: var(--accent);
+  opacity: 0.85;
   line-height: 1.2;
 }
 
@@ -413,9 +413,9 @@ body::before {
   font-weight: 600;
   letter-spacing: 1.8px;
   text-transform: uppercase;
-  color: var(--amber-400);
+  color: var(--accent);
   margin-bottom: 2px;
-  opacity: 0.85;
+  opacity: 1;
 }
 
 .toolbar-description {
@@ -518,8 +518,8 @@ body::before {
   font-weight: 600;
   letter-spacing: 1.8px;
   text-transform: uppercase;
-  color: var(--amber-300);
-  opacity: 0.9;
+  color: var(--accent);
+  opacity: 1;
   margin-bottom: 6px;
 }
 
@@ -796,8 +796,8 @@ body::before {
   font-weight: 600;
   letter-spacing: 1.8px;
   text-transform: uppercase;
-  color: var(--amber-400);
-  opacity: 0.85;
+  color: var(--accent);
+  opacity: 1;
 }
 
 .lab-heading h3 {
@@ -879,12 +879,12 @@ body::before {
   font-family: var(--font-mono);
   font-size: 11px;
   padding: 3px 10px;
-  background: rgba(232, 200, 74, 0.12);
-  color: var(--amber-300);
+  background: rgba(109, 40, 217, 0.1);
+  color: #5b21b6;
   border-radius: 100px;
   font-weight: 500;
-  border: 1px solid rgba(232, 200, 74, 0.25);
-  box-shadow: 0 0 8px var(--amber-glow-soft);
+  border: 1px solid rgba(109, 40, 217, 0.25);
+  box-shadow: none;
 }
 
 .code-section pre {
@@ -944,8 +944,8 @@ body::before {
   font-weight: 600;
   letter-spacing: 1.8px;
   text-transform: uppercase;
-  color: var(--amber-400);
-  opacity: 0.85;
+  color: var(--accent);
+  opacity: 1;
   margin-bottom: 2px;
 }
 
