@@ -32,6 +32,8 @@ const groupList      = document.getElementById("groupList");
 const mainContent    = document.querySelector(".main-content");
 const scrollTopBtn   = document.getElementById("scrollTopBtn");
 const themeToggleBtn = document.getElementById("themeToggleBtn");
+const discussionSection = document.getElementById("discussionSection");
+const discussionText    = document.getElementById("discussionText");
 
 // ── State ─────────────────────────────────────────
 let groupData       = null;
@@ -231,6 +233,14 @@ async function loadLabAct(act) {
     labTitle.textContent       = act.name;
     labDescription.textContent = act.description || "";
     sourceFile.textContent     = act.file;
+
+    if (act.discussion) {
+          discussionText.textContent = act.discussion;
+          discussionSection.hidden   = false;
+        } else {
+          discussionSection.hidden = true;
+        }
+
     codeBlock.textContent      = codeText;
     codeBlock.className        = act.file.endsWith(".java") ? "language-java" : "language-javascript";
 

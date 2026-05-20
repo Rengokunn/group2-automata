@@ -13,6 +13,7 @@
       "file": "DivisionAlgorithm.js",
       "screenshot": "screenshots/DivisionAlgorithm.png",
       "description": "Computes the quotient and remainder for two integers using the division algorithm. Given integers a and b, finds q and r such that a = b(q) + r.",
+      "discussion": "The Division Algorithm is a fundamental theorem in number theory. Given any integer a (dividend) and non-zero integer b (divisor), there exist unique integers q (quotient) and r (remainder) such that a = b·q + r, where 0 ≤ r < |b|. This guarantees every integer division produces a well-defined quotient and remainder — the backbone of modular arithmetic, GCD computation, and cryptography.",
       "inputs": [
         { "label": "First Integer", "placeholder": "positive integer, e.g. 17" },
         { "label": "Second Integer", "placeholder": "positive integer, e.g. 5" }
@@ -23,6 +24,7 @@
       "file": "EuclideanAlgorithm.js",
       "screenshot": "screenshots/EuclideanAlgorithm.png",
       "description": "Finds the Greatest Common Divisor (GCD) and Least Common Multiple (LCM) of two positive integers using the Euclidean algorithm.",
+      "discussion": "The Euclidean Algorithm is one of the oldest known algorithms, described by Euclid around 300 BCE. It computes the Greatest Common Divisor (GCD) of two integers by repeatedly replacing the larger number with the remainder of dividing the larger by the smaller, until the remainder is zero. The last non-zero remainder is the GCD. The LCM is then derived using the identity: LCM(a, b) = |a · b| / GCD(a, b).",
       "inputs": [
         { "label": "First Integer", "placeholder": "positive integer, e.g. 48" },
         { "label": "Second Integer", "placeholder": "positive integer, e.g. 18" }
@@ -33,6 +35,7 @@
       "file": "CollatzSequence.js",
       "screenshot": "screenshots/CollatzSequence.png",
       "description": "Finds all terms of the Collatz sequence starting from a given positive odd integer. The sequence follows: if odd → 3n+1, if even → n/2, until reaching 1.",
+      "discussion": "The Collatz Sequence (also called the 3n+1 problem) is an unsolved conjecture in mathematics. Starting from any positive integer n: if n is odd, the next term is 3n + 1; if n is even, the next term is n / 2. The conjecture states that no matter what positive integer you start with, the sequence will always eventually reach 1. Despite its simple rules, no general proof has been found.",
       "inputs": [
         { "label": "Initial Value", "placeholder": "positive odd integer, e.g. 7" }
       ]
@@ -42,6 +45,7 @@
       "file": "PalindromeChecker.js",
       "screenshot": "screenshots/PalindromeChecker.png",
       "description": "Checks whether a given string is a palindrome. Ignores spaces, punctuation, and capitalization during the check.",
+      "discussion": "A palindrome is a word, phrase, or sequence that reads the same forwards and backwards. The checker works by normalizing the input — stripping spaces, punctuation, and converting to lowercase — then comparing the cleaned string against its reverse. If they match, the input is a palindrome. Classic examples include 'racecar', 'madam', and the phrase 'A man, a plan, a canal: Panama'.",
       "inputs": [
         { "label": "String", "placeholder": "e.g. A man a plan a canal Panama" }
       ]
@@ -59,6 +63,7 @@
           "screenshot": "screenshots/Fibonacci.png",
           "introImage": "screenshots/Fibonacci_intro.png",
           "description": "Generates Fibonacci numbers recursively. The sequence starts with 0, 1 and each term is the sum of the two preceding terms. Valid input: number of terms greater than 2.",
+          "discussion": "The Fibonacci sequence is defined by the recurrence F(n) = F(n-1) + F(n-2), with base cases F(0) = 0 and F(1) = 1. Each term is the sum of the two preceding ones, producing: 0, 1, 1, 2, 3, 5, 8, 13, 21... The recursive approach directly mirrors this definition. It appears extensively in nature (flower petals, spiral shells) and is foundational in algorithm analysis.",
           "inputs": [
             { "label": "Number of Terms", "placeholder": "integer greater than 2, e.g. 5" }
           ]
@@ -69,6 +74,7 @@
           "screenshot": "screenshots/Lucas.png",
           "introImage": "screenshots/Lucas_intro.png",
           "description": "Generates Lucas numbers recursively. Similar to Fibonacci but starts with 2, 1. Each subsequent term is the sum of the two preceding terms. Valid input: number of terms greater than 2.",
+          "discussion": "The Lucas sequence follows the same recurrence as Fibonacci — L(n) = L(n-1) + L(n-2) — but uses different starting values: L(0) = 2 and L(1) = 1, producing: 2, 1, 3, 4, 7, 11, 18... Lucas numbers are closely related to Fibonacci numbers and share many of their mathematical properties. They appear in primality testing and the analysis of certain algorithms.",
           "inputs": [
             { "label": "Number of Terms", "placeholder": "integer greater than 2, e.g. 5" }
           ]
@@ -79,6 +85,7 @@
           "screenshot": "screenshots/Tribonacci.png",
           "introImage": "screenshots/Tribonacci_intro.png",
           "description": "Generates Tribonacci numbers recursively. Starts with 0, 0, 1 and each term is the sum of the three preceding terms. Valid input: number of terms greater than 3.",
+          "discussion": "The Tribonacci sequence extends Fibonacci by summing the three most recent terms: T(n) = T(n-1) + T(n-2) + T(n-3), with base cases T(0) = 0, T(1) = 0, T(2) = 1, producing: 0, 0, 1, 1, 2, 4, 7, 13, 24... The recursive implementation reflects this three-way dependency directly. Tribonacci numbers generalize Fibonacci and appear in combinatorics and tiling problems.",
           "inputs": [
             { "label": "Number of Terms", "placeholder": "integer greater than 3, e.g. 10" }
           ]
