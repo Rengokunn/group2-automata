@@ -1671,14 +1671,14 @@ img[hidden] {
   background: rgba(8, 4, 18, 0.5);
   border: 1px solid var(--haze-border);
   overflow: hidden;
-  cursor: zoom-in;
+  cursor: default;
   transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
 }
 
 .intro-image:hover {
   border-color: var(--haze-border-2);
   box-shadow: 0 0 30px rgba(139, 92, 246, 0.08);
-  transform: none;
+  transform: scale(1.02);
 }
 
 [data-theme="light"] .intro-image {
