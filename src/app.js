@@ -334,9 +334,12 @@ runBtn.addEventListener("click", () => {
         if (err !== null && inputEls[i]) inputEls[i].classList.add("input-error");
       });
 
-      // Show the first error message in the output box
-      const firstError = fieldErrors.find(e => e !== null);
-      outputBox.textContent = `Error: ${firstError}`;
+      // Show all error messages in the output box
+      const allErrors = fieldErrors
+        .map((err, i) => err !== null ? `Field ${i + 1}: ${err}` : null)
+        .filter(Boolean)
+        .join("\n");
+      outputBox.textContent = `Error:\n${allErrors}`;
       outputBox.className   = "output-box error";
 
       if (remaining <= 0) {
