@@ -17,7 +17,7 @@ function main(inputs) {
     "",
     `Input the number of terms: ${n}`,
     "",
-    `The Lucas numbers are: ${terms.map(n => n.toLocaleString("en-US")).join(", ")}`,
+    `The Lucas numbers are: ${terms.join(", ")}`,
   ].join("\n");
 }
 
